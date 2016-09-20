@@ -1,0 +1,81 @@
+<html>
+<head>
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript">
+    
+        var socket = io.connect();
+        
+        socket.on('connect', function() {
+            console.log("Connected");
+        });
+
+        socket.on('active_users', function (data) {
+            console.log("activeuser:", data);
+            document.getElementById('buttons_wrapper').innerHTML = "<p>Send alerts to these silly fellas:</p>";
+            for(var i = 0; i < data.length; i++){    
+                document.getElementById('buttons_wrapper').innerHTML += "<button onclick=\"sendalert(document.getElementById('alertArea').value, '"+data[i]+"');\">"+data[i]+"</button><br>";
+            }
+        });
+        
+        var sendmessage = function(message) {
+            console.log("chatmessage: " + message);
+            socket.emit('chatmessage', message);
+        };
+
+        var sendusername = function(username) {
+            console.log("username: " + username);
+            socket.emit("username", username);
+            document.getElementById('username').value = "";
+            document.getElementById('username_wrapper').innerHTML = "<h2 class='headline'>Welcome to A-L-E-R-T-S, " + username + "!</h2>";
+            document.getElementById('messages_wrapper').style.display = 'block';
+        };
+
+        var sendalert = function(alert_text, recipient) {
+            if( alert_text.length > 0){
+                console.log("alert_text: " + alert_text);
+                console.log("recipient: " + recipient);
+                socket.emit('chatalert', [recipient, alert_text]);
+                document.getElementById('alertArea').value = "";
+            }else{
+                alert("Hey, silly, don't send empty messages! The last thing this is about is spaming your friends with empty alerts!");
+            }
+            
+        };
+
+        // Receive from any event
+        socket.on('incomingAlert', function (data) {
+            console.log("new Alert", data);
+            alert(data);
+            
+        });
+
+        
+
+    </script> 
+    <link rel="stylesheet" type="text/css" href="styles.css"></link> 
+
+    
+
+</head>
+<body>
+
+<div id="username_wrapper">
+<h2 class="headline">Enter your name please</h2>
+<input type="text" id="username" name="message">
+<input type="submit" value="submit" onclick="sendusername(document.getElementById('username').value); ">
+</div>
+
+
+<div id="messages_wrapper" style="display: none">
+    <p style="margin-bottom: 0px;">Message into here:</p>
+    <!-- <input type="text" id="message" name="message"> -->
+    <textarea type="text" id="alertArea" style="width:250px; height:100px">Hey Silly Goose!</textarea>
+    <!-- <input type="submit" value="submit" onclick="sendmessage(document.getElementById('message').value);"> -->
+</div>
+
+<div id="buttons_wrapper">
+    
+</div>
+
+</body>
+</html>

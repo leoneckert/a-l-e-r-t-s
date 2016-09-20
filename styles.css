@@ -1,0 +1,13 @@
+body{
+    background-color: #45BA62;
+    text-align:center;
+    margin-top: 15%;
+}
+
+.headline{
+    margin-bottom: 20px;
+}
+
+#alertArea{
+    margin-top: 10px;
+}
